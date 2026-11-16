@@ -1,4 +1,8 @@
 {{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
+{{--
     A landing page: the text across the whole width, with no heading and
     no breadcrumbs, for pages that bring their own.
 --}}

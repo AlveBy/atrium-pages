@@ -1,3 +1,7 @@
+{{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
 {{-- A section: its text, then a card for every page below it. --}}
 @extends('atrium-theme::layout', [
     'metaTitle' => $page->getSeoTitle() ?: $title,
