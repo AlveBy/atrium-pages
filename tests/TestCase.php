@@ -42,6 +42,16 @@ abstract class TestCase extends Orchestra
         $config->set('atrium.demo', false);
         $config->set('atrium.auth.two_factor.enabled', false);
         $config->set('atrium.dashboard.timings.enabled', false);
+        $config->set('atrium.modules', [PagesServiceProvider::MODULE]);
+    }
+
+    /**
+     * On MySQL and PostgreSQL the whole suite shares one database, set up by
+     * whichever package's tests run first: the pages table comes with these.
+     */
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     protected function setUp(): void

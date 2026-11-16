@@ -6,7 +6,7 @@ Static pages for [Atrium](https://github.com/AlveBy/atrium): about us, contacts,
 
 ```bash
 composer require alveby/atrium-pages
-php artisan migrate
+php artisan atrium:module:install alveby/atrium-pages
 ```
 
 "Pages" appears in the admin menu. A page has a name, a code (the last part of its address), a parent page, a template, a sort order, an active flag, a text (a `ContentField`: visual editor, HTML or plain text) and an SEO tab (title, description, keywords, picture for sharing).

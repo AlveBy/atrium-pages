@@ -38,6 +38,19 @@
         }
     },
     "extra": {
+        "atrium": {
+            "resources": [
+                "Atrium\\Pages\\Models\\Page"
+            ],
+            "public_urls": {
+                "Atrium\\Pages\\Models\\Page": {
+                    "prefix": "",
+                    "tree": "Atrium\\Pages\\Models\\Page",
+                    "parent": "parent_id"
+                }
+            },
+            "migrations": "database/migrations"
+        },
         "laravel": {
             "providers": [
                 "Atrium\\Pages\\PagesServiceProvider"

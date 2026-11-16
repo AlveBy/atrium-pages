@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace Atrium\Pages;
 
+use Atrium\Admin\Modules\Modules;
 use Atrium\Pages\Console\ImportBitrixPagesCommand;
 use Atrium\Pages\Http\Controllers\PageController;
-use Atrium\Pages\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
+/**
+ * The model, its pages' addresses and the migrations are in composer.json
+ * (extra.atrium) and come in with `atrium:module:install`.
+ */
 final class PagesServiceProvider extends ServiceProvider
 {
+    public const MODULE = 'alveby/atrium-pages';
+
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/atrium-pages.php', 'atrium-pages');
         $this->app->singleton(PageTree::class);
-
-        config()->push('atrium.resources', Page::class);
-
-        // The address under the code field and `public_url` in the API: the
-        // path of the page's codes from the root of the site. An empty
-        // prefix keeps the theme from drawing pages itself.
-        if (! array_key_exists(Page::class, (array) config('atrium.public_urls', []))) {
-            config()->set('atrium.public_urls.'.Page::class, ['prefix' => '', 'tree' => Page::class, 'parent' => 'parent_id']);
-        }
     }
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'atrium-pages');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'atrium-pages');
 
-        if (config('atrium-pages.routes', true) && ! $this->app->routesAreCached()) {
+        // Not installed, the module has no table: every unknown address
+        // would fail instead of being a 404.
+        $installed = $this->app->make(Modules::class)->isInstalled(self::MODULE);
+
+        if ($installed && config('atrium-pages.routes', true) && ! $this->app->routesAreCached()) {
             $this->registerRoutes();
         }
 

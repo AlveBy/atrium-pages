@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->index();
             // One address part for every language: /about and /de/about.
             $table->string('code');
-            $table->json('name');
+            // jsonb: PostgreSQL sorts by it (the parent field lists pages by
+            // name); MySQL and SQLite make it json.
+            $table->jsonb('name');
             $table->json('content')->nullable();
             $table->string('template', 50)->default('default');
             $table->boolean('active')->default(true);
