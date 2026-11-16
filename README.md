@@ -9,6 +9,8 @@ composer require alveby/atrium-pages
 php artisan atrium:module:install alveby/atrium-pages
 ```
 
+Add `--demo` to fill it with a shop's pages (about us with two subpages, delivery and payment, contacts) in English, German and Russian; the German and Russian texts show once those languages are on.
+
 "Pages" appears in the admin menu. A page has a name, a code (the last part of its address), a parent page, a template, a sort order, an active flag, a text (a `ContentField`: visual editor, HTML or plain text) and an SEO tab (title, description, keywords, picture for sharing).
 
 - The name and the text are written per content language; only the default language is required. The code is one for all languages: `/about` and `/de/about`.
