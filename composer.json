@@ -1,0 +1,52 @@
+{
+    "name": "alveby/atrium-pages",
+    "description": "Static pages for Atrium: a tree per site, translated, with SEO, templates and an import of 1C-Bitrix static pages",
+    "type": "atrium-module",
+    "license": "MIT",
+    "homepage": "https://github.com/AlveBy/atrium",
+    "support": {
+        "issues": "https://github.com/AlveBy/atrium/issues",
+        "source": "https://github.com/AlveBy/atrium"
+    },
+    "keywords": [
+        "laravel",
+        "admin",
+        "cms",
+        "pages",
+        "bitrix",
+        "multisite",
+        "i18n"
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^13.0",
+        "alveby/atrium": "^0.1",
+        "alveby/atrium-theme": "^0.1"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Atrium\\Pages\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atrium\\Pages\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Atrium\\Pages\\PagesServiceProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

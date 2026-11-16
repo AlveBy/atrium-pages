@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+// Machine-translated from English; needs review by a native speaker.
+return [
+    'module' => 'Pages',
+    'create' => 'Ajouter une page',
+    'root' => 'Niveau supérieur',
+    'fields' => [
+        'name' => 'Nom',
+        'code' => 'Adresse',
+        'parent' => 'Page parente',
+        'template' => 'Modèle',
+        'content' => 'Texte',
+        'updated_at' => 'Modifiée',
+    ],
+    'hints' => [
+        'code' => 'La dernière partie de l\'adresse de la page. Les pages d\'un même parent doivent en avoir des différentes.',
+    ],
+    'templates' => [
+        'default' => 'Page',
+        'children' => 'Page avec ses sous-pages',
+        'landing' => 'Pleine largeur, sans titre',
+    ],
+    'errors' => [
+        'code_taken' => 'Une autre page du même parent a déjà cette adresse.',
+    ],
+];
