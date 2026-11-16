@@ -14,6 +14,7 @@ php artisan atrium:module:install alveby/atrium-pages
 - The name and the text are written per content language; only the default language is required. The code is one for all languages: `/about` and `/de/about`.
 - Pages belong to a site: each site has its own tree.
 - Pages under one parent need different codes. A code may have capitals and underscores, so moved pages keep addresses like `/price_list`.
+- "Subpage", in a page's row and on its form, opens a new page with that page as its parent.
 - Deleting a page moves its subpages up to its parent.
 
 ## On the site

@@ -7,6 +7,9 @@ return [
     'module' => 'Strony',
     'create' => 'Dodaj stronę',
     'root' => 'Najwyższy poziom',
+    'actions' => [
+        'subpage' => 'Podstrona',
+    ],
     'fields' => [
         'name' => 'Nazwa',
         'code' => 'Adres',

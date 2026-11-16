@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Tests;
 
+use Atrium\Admin\Models\AdminRole;
+use Atrium\Admin\Models\AdminUser;
 use Atrium\Pages\Models\Page;
 use Inertia\Testing\AssertableInertia;
 
@@ -147,5 +149,40 @@ final class AdminTest extends TestCase
                 ->where('fields.2.publicPrefix', '')
                 ->where('fields.2.parentField', 'parent_id')
                 ->where("fields.2.parentPaths.{$about->id}", 'about'));
+    }
+
+    public function test_a_subpage_is_added_from_its_parent(): void
+    {
+        $about = Page::query()->create(['name' => 'About us', 'code' => 'about']);
+        $subpage = ['name' => 'subpage', 'label' => 'Subpage', 'fill' => ['parent_id' => 'id']];
+
+        $this->actingAs($this->admin(), 'admin')
+            ->get('/admin/pages')
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('actions', [$subpage]));
+
+        $this->get("/admin/pages/{$about->id}/edit")
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('actions', [$subpage]));
+
+        // The button's link: the parent is chosen; nothing else comes from
+        // the address.
+        $this->get("/admin/pages/create?parent_id={$about->id}&code=hacked")
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page
+                ->where('fields', fn ($fields): bool => collect($fields)->firstWhere('name', 'parent_id')['default'] === $about->id
+                    && collect($fields)->firstWhere('name', 'code')['default'] === null));
+    }
+
+    public function test_without_the_right_to_create_there_is_no_subpage_button(): void
+    {
+        $about = Page::query()->create(['name' => 'About us', 'code' => 'about']);
+        $editor = AdminUser::query()->create(['name' => 'Editor', 'email' => 'editor@example.com', 'password' => 'secret-password', 'is_active' => true]);
+        $editor->roles()->attach(AdminRole::query()->create(['name' => 'Editor', 'permissions' => ['pages.view', 'pages.update']]));
+
+        $this->actingAs($editor, 'admin')
+            ->get("/admin/pages/{$about->id}/edit")
+            ->assertOk()
+            ->assertInertia(fn (AssertableInertia $page) => $page->where('actions', []));
     }
 }

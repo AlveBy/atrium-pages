@@ -7,6 +7,9 @@ return [
     'module' => 'Pagine',
     'create' => 'Aggiungi pagina',
     'root' => 'Livello superiore',
+    'actions' => [
+        'subpage' => 'Sottopagina',
+    ],
     'fields' => [
         'name' => 'Nome',
         'code' => 'Indirizzo',

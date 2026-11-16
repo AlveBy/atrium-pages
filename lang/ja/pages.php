@@ -7,6 +7,9 @@ return [
     'module' => 'ページ',
     'create' => 'ページを追加',
     'root' => '最上位',
+    'actions' => [
+        'subpage' => 'サブページ',
+    ],
     'fields' => [
         'name' => '名前',
         'code' => 'アドレス',

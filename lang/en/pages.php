@@ -6,6 +6,9 @@ return [
     'module' => 'Pages',
     'create' => 'Add page',
     'root' => 'Top level',
+    'actions' => [
+        'subpage' => 'Subpage',
+    ],
     'fields' => [
         'name' => 'Name',
         'code' => 'Address',

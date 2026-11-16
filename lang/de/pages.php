@@ -7,6 +7,9 @@ return [
     'module' => 'Seiten',
     'create' => 'Seite hinzufügen',
     'root' => 'Oberste Ebene',
+    'actions' => [
+        'subpage' => 'Unterseite',
+    ],
     'fields' => [
         'name' => 'Name',
         'code' => 'Adresse',

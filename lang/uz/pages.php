@@ -7,6 +7,9 @@ return [
     'module' => 'Sahifalar',
     'create' => 'Sahifa qo\'shish',
     'root' => 'Yuqori daraja',
+    'actions' => [
+        'subpage' => 'Ichki sahifa',
+    ],
     'fields' => [
         'name' => 'Nomi',
         'code' => 'Manzil',

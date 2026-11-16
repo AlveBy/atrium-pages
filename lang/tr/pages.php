@@ -7,6 +7,9 @@ return [
     'module' => 'Sayfalar',
     'create' => 'Sayfa ekle',
     'root' => 'Üst düzey',
+    'actions' => [
+        'subpage' => 'Alt sayfa',
+    ],
     'fields' => [
         'name' => 'Ad',
         'code' => 'Adres',

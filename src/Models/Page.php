@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Models;
 
+use Atrium\Admin\Actions\CreateFromRecord;
 use Atrium\Admin\Columns\BooleanColumn;
 use Atrium\Admin\Columns\DateColumn;
 use Atrium\Admin\Columns\TextColumn;
@@ -149,6 +150,17 @@ class Page extends Model implements Administrable, HasSeoFields, Sitemapable
                 ->options(Templates::options())->default(Templates::DEFAULT)->required(),
             NumberField::make('sort')->label(__('atrium::fields.standard.sort'))->default(500),
             ContentField::make('content')->label(__('atrium-pages::pages.fields.content'))->defaultMode('html'),
+        ];
+    }
+
+    /**
+     * "Subpage" on a page in the list and on its form: a new page with this
+     * one as its parent.
+     */
+    public static function getAdministrationActions(): array
+    {
+        return [
+            CreateFromRecord::make('subpage')->label(__('atrium-pages::pages.actions.subpage'))->fill(['parent_id' => 'id']),
         ];
     }
 

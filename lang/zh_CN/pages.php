@@ -7,6 +7,9 @@ return [
     'module' => '页面',
     'create' => '添加页面',
     'root' => '顶层',
+    'actions' => [
+        'subpage' => '子页面',
+    ],
     'fields' => [
         'name' => '名称',
         'code' => '地址',
