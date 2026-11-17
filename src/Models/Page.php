@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Atrium\Pages\Models;
 
 use Atrium\Admin\Actions\CreateFromRecord;
+use Atrium\Admin\Cache\CachesRecords;
 use Atrium\Admin\Columns\BooleanColumn;
 use Atrium\Admin\Columns\DateColumn;
 use Atrium\Admin\Columns\TextColumn;
 use Atrium\Admin\Contracts\Administrable;
+use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Contracts\HasSeoFields;
 use Atrium\Admin\Contracts\Sitemapable;
 use Atrium\Admin\Fields\CheckboxField;
@@ -54,9 +56,9 @@ use Illuminate\Validation\ValidationException;
  * @property int $sort
  * @property string|null $source
  */
-class Page extends Model implements Administrable, HasSeoFields, Sitemapable
+class Page extends Model implements Administrable, Cacheable, HasSeoFields, Sitemapable
 {
-    use BelongsToSite, HasAdminSeo, HasAdminTabs, InteractsWithAdmin, Translatable;
+    use BelongsToSite, CachesRecords, HasAdminSeo, HasAdminTabs, InteractsWithAdmin, Translatable;
 
     protected $table = 'pages';
 

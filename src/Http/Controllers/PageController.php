@@ -98,23 +98,23 @@ final class PageController extends Controller
         $first = Str::before($path, '/');
 
         if ($first !== $path && $first !== $default && $this->languages->has($first)) {
-            [$page, $old] = $this->find(Str::after($path, '/'));
+            [$page, $old] = $this->find(Str::after($path, '/'), $first);
 
             if ($page !== null) {
                 return [$first, $page, $old];
             }
         }
 
-        return [$default, ...$this->find($path)];
+        return [$default, ...$this->find($path, $default)];
     }
 
     /**
      * @return array{0:?Page,1:bool}
      */
-    private function find(string $path): array
+    private function find(string $path, string $language): array
     {
         if (! str_ends_with($path, '.php')) {
-            return [$this->tree->find($path), false];
+            return [$this->tree->find($path, $language), false];
         }
 
         // Bitrix served /about/ from /about/index.php and /about/team/ from
@@ -122,6 +122,6 @@ final class PageController extends Controller
         $path = preg_replace('#(^|/)index\.php$#', '', $path) ?? $path;
         $path = preg_replace('#\.php$#', '', $path) ?? $path;
 
-        return [$path === '' ? null : $this->tree->find($path), true];
+        return [$path === '' ? null : $this->tree->find($path, $language), true];
     }
 }

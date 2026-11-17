@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Atrium\Pages;
 
+use Atrium\Admin\Cache\Card;
+use Atrium\Admin\Cache\RecordCache;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\Sites;
 use Atrium\Pages\Models\Page;
@@ -20,14 +22,15 @@ use Illuminate\Support\Collection;
  *
  * A page is visible when it and every page above it are active: hiding a
  * page hides its branch. The tree is read once (one query, no texts) and
- * kept until a page is saved or deleted.
+ * kept in the record cache until a page is saved or deleted; the pages
+ * themselves come from their cards.
  */
 final class PageTree
 {
     /** How many levels a path may have; also stops a loop in broken data. */
     private const MAX_DEPTH = 20;
 
-    /** @var array<string,array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>}> */
+    /** @var array<string,array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>,languages:array<int,array<int,string>>}> */
     private array $trees = [];
 
     public function __construct(
@@ -36,13 +39,14 @@ final class PageTree
     ) {}
 
     /**
-     * The visible page at a path below the site root ("about/team").
+     * The visible page at a path below the site root ("about/team"), read
+     * in a language (the current one by default).
      */
-    public function find(string $path): ?Page
+    public function find(string $path, ?string $language = null): ?Page
     {
         $id = $this->tree()['ids'][trim($path, '/')] ?? null;
 
-        return $id === null ? null : Page::query()->find($id);
+        return $id === null ? null : $this->load([$id], $language)->first();
     }
 
     /**
@@ -62,7 +66,7 @@ final class PageTree
         $language ??= app()->getLocale();
         $path = $this->path($page);
 
-        if ($path === null || ! $this->languages->has($language) || $page->getTranslation('name', $language, false) === '') {
+        if ($path === null || ! $this->languages->has($language) || ! in_array($language, $this->tree()['languages'][$page->getKey()] ?? [], true)) {
             return null;
         }
 
@@ -125,41 +129,41 @@ final class PageTree
      * @param  array<int,int>  $ids
      * @return Collection<int,Page>
      */
-    private function load(array $ids): Collection
+    private function load(array $ids, ?string $language = null): Collection
     {
         if ($ids === []) {
             return new Collection;
         }
 
-        $pages = Page::query()->whereKey($ids)->get()->keyBy('id');
-
-        return collect($ids)->map(fn (int $id): ?Page => $pages->get($id))->filter()->values();
+        /** @var Collection<int,Page> */
+        return collect(Page::cachedMany($ids, $language))->map(fn (Card $card): Page => $card->model(Page::class))->values();
     }
 
     /**
-     * @return array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>}
+     * @return array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>,languages:array<int,array<int,string>>}
      */
     private function tree(): array
     {
         $key = $this->sites->isResolved() ? $this->sites->current()->getKey() : '*';
 
-        return $this->trees[$key] ??= $this->build();
+        return $this->trees[$key] ??= app(RecordCache::class)->remember(Page::class, 'page-tree', fn (): array => $this->build());
     }
 
     /**
-     * @return array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>}
+     * @return array{paths:array<int,string>,ids:array<string,int>,parents:array<int,int|null>,children:array<int,array<int,int>>,languages:array<int,array<int,string>>}
      */
     private function build(): array
     {
         $rows = Page::query()
             ->orderBy('sort')
             ->orderBy('id')
-            ->get(['id', 'parent_id', 'code', 'active'])
+            ->get(['id', 'parent_id', 'code', 'active', 'name'])
             ->keyBy('id');
 
         $paths = [];
         $parents = [];
         $children = [];
+        $languages = [];
 
         foreach ($rows as $id => $row) {
             $path = $this->pathOf($row, $rows);
@@ -167,6 +171,8 @@ final class PageTree
             if ($path !== null) {
                 $paths[$id] = $path;
                 $parents[$id] = $row->parent_id;
+                // The languages the page has a name in: it has an address in those.
+                $languages[$id] = array_keys(array_filter((array) $row->getTranslations('name'), static fn (mixed $name): bool => (string) $name !== ''));
             }
         }
 
@@ -184,7 +190,7 @@ final class PageTree
             $ids[$path] ??= $id;
         }
 
-        return ['paths' => $paths, 'ids' => $ids, 'parents' => $parents, 'children' => $children];
+        return ['paths' => $paths, 'ids' => $ids, 'parents' => $parents, 'children' => $children, 'languages' => $languages];
     }
 
     /**
