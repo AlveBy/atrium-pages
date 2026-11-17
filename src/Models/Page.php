@@ -82,7 +82,7 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Site
     {
         $forget = static function (): void {
             app(PageTree::class)->flush();
-            PublicUrl::forgetPaths();
+            PublicUrl::forgetMemo();
         };
 
         static::saved($forget);
