@@ -81,7 +81,7 @@ final class ImportBitrixPagesCommand extends Command
 
         // The pages are this site's: new ones get its id, lookups see only it.
         $sites->setCurrent($site);
-        $this->language = (string) ($this->option('language') ?: $languages->default());
+        $this->language = $this->option('language') ?: $languages->default();
 
         if (! $languages->has($this->language)) {
             $this->error("{$this->language} is not an active content language of the site.");

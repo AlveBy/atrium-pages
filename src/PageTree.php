@@ -62,7 +62,7 @@ final class PageTree
         $language ??= app()->getLocale();
         $path = $this->path($page);
 
-        if ($path === null || ! $this->languages->has($language) || (string) $page->getTranslation('name', $language, false) === '') {
+        if ($path === null || ! $this->languages->has($language) || $page->getTranslation('name', $language, false) === '') {
             return null;
         }
 
@@ -98,7 +98,7 @@ final class PageTree
         $ids = [];
         $id = $tree['parents'][$page->getKey()] ?? null;
 
-        for ($depth = 0; $id !== null && $depth < self::MAX_DEPTH; $depth++) {
+        while ($id !== null) {
             array_unshift($ids, $id);
             $id = $tree['parents'][$id] ?? null;
         }
@@ -141,7 +141,7 @@ final class PageTree
      */
     private function tree(): array
     {
-        $key = $this->sites->isResolved() ? (string) $this->sites->current()->getKey() : '*';
+        $key = $this->sites->isResolved() ? $this->sites->current()->getKey() : '*';
 
         return $this->trees[$key] ??= $this->build();
     }
@@ -162,32 +162,10 @@ final class PageTree
         $children = [];
 
         foreach ($rows as $id => $row) {
-            $parts = [];
-            $cursor = $row;
-            $visible = true;
+            $path = $this->pathOf($row, $rows);
 
-            for ($depth = 0; $cursor !== null; $depth++) {
-                if ($depth >= self::MAX_DEPTH || ! $cursor->active || $cursor->code === '') {
-                    $visible = false;
-
-                    break;
-                }
-
-                array_unshift($parts, $cursor->code);
-                $parentId = $cursor->parent_id;
-
-                if ($parentId !== null && ! $rows->has($parentId)) {
-                    // The parent is gone or belongs to another site.
-                    $visible = false;
-
-                    break;
-                }
-
-                $cursor = $parentId === null ? null : $rows->get($parentId);
-            }
-
-            if ($visible) {
-                $paths[$id] = implode('/', $parts);
+            if ($path !== null) {
+                $paths[$id] = $path;
                 $parents[$id] = $row->parent_id;
             }
         }
@@ -207,5 +185,35 @@ final class PageTree
         }
 
         return ['paths' => $paths, 'ids' => $ids, 'parents' => $parents, 'children' => $children];
+    }
+
+    /**
+     * The address of a page, or null when the page is hidden: off, without
+     * a code, too deep, or standing on a parent that is gone or belongs to
+     * another site.
+     *
+     * @param  Collection<int,Page>  $rows
+     */
+    private function pathOf(Page $row, Collection $rows): ?string
+    {
+        $parts = [];
+        $cursor = $row;
+
+        for ($depth = 0; $cursor !== null; $depth++) {
+            if ($depth >= self::MAX_DEPTH || ! $cursor->active || $cursor->code === '') {
+                return null;
+            }
+
+            array_unshift($parts, $cursor->code);
+            $parentId = $cursor->parent_id;
+
+            if ($parentId !== null && ! $rows->has($parentId)) {
+                return null;
+            }
+
+            $cursor = $parentId === null ? null : $rows->get($parentId);
+        }
+
+        return implode('/', $parts);
     }
 }

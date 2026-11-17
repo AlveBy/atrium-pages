@@ -38,7 +38,7 @@ final class Templates
     {
         $templates = self::all();
 
-        return $templates[(string) $key] ?? $templates[self::DEFAULT] ?? reset($templates);
+        return $templates[$key] ?? $templates[self::DEFAULT] ?? reset($templates);
     }
 
     /**

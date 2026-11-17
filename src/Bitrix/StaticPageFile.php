@@ -72,7 +72,7 @@ final class StaticPageFile
         $end = preg_match('#<\?(?:php)?(?:(?!\?>).)*?/bitrix/footer\.php#s', $source, $footer, PREG_OFFSET_CAPTURE, $start)
             ? $footer[0][1]
             : strlen($source);
-        $body = substr($source, $start, max(0, $end - $start));
+        $body = substr($source, $start, $end - $start);
 
         preg_match_all('#IncludeComponent\(\s*["\']([^"\']+)["\']#', $body, $matches);
         $components = array_values(array_unique($matches[1]));
@@ -118,7 +118,7 @@ final class StaticPageFile
         preg_match_all($pattern, $source, $matches, PREG_SET_ORDER);
 
         return array_map(
-            static fn (array $match): array => array_values(array_map(self::unquote(...), array_filter(array_slice($match, 1), static fn (string $part): bool => $part !== ''))),
+            static fn (array $match): array => array_map(self::unquote(...), array_slice($match, 1)),
             $matches,
         );
     }

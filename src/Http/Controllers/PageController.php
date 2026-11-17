@@ -58,12 +58,12 @@ final class PageController extends Controller
         }
 
         $breadcrumbs = $this->tree->ancestors($page)
-            ->map(fn (Page $ancestor): array => ['label' => (string) $ancestor->name, 'url' => (string) $this->tree->url($ancestor, $language)])
+            ->map(fn (Page $ancestor): array => ['label' => $ancestor->name, 'url' => (string) $this->tree->url($ancestor, $language)])
             ->all();
 
         $children = $this->tree->children($page)
             ->map(fn (Page $child): array => [
-                'title' => (string) $child->name,
+                'title' => $child->name,
                 'url' => $this->tree->url($child, $language),
                 'text' => $child->getSeoDescription(),
             ])
@@ -75,7 +75,7 @@ final class PageController extends Controller
 
         return view(Templates::view($page->template), [
             'page' => $page,
-            'title' => (string) $page->name,
+            'title' => $page->name,
             'content' => $content === '' ? null : new HtmlString($content),
             'children' => $children,
             'canonical' => $url,
