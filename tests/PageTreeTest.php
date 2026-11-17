@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Tests;
 
+use Atrium\Admin\Cache\RecordCache;
 use Atrium\Admin\Models\Language;
 use Atrium\Admin\Models\Site;
 use Atrium\Admin\Support\Sites;
@@ -18,6 +19,8 @@ use Atrium\Pages\PageTree;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Translatable\Translatable;
 
 /**
  * Which pages are visible and at what path, and how a page is drawn from
@@ -149,6 +152,59 @@ final class PageTreeTest extends TestCase
 
         $about->setTranslation('name', 'de', 'Über uns')->save();
         $this->assertSame(url('/de/about'), $tree->url($about, 'de'));
+    }
+
+    public function test_a_page_has_no_address_in_a_language_the_site_does_not_have_even_if_it_is_written_in_it(): void
+    {
+        $about = $this->page('about', 'About us');
+        $about->setTranslation('name', 'xx', 'Unknown tongue')->save();
+        $tree = app(PageTree::class);
+
+        $this->assertNull($tree->url($about, 'xx'));
+        $this->assertSame(url('/about'), $tree->url($about, 'en'));
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function emptyNames(): array
+    {
+        return [
+            'an empty text' => ['""'],
+            'no text at all' => ['null'],
+        ];
+    }
+
+    #[DataProvider('emptyNames')]
+    public function test_a_page_with_an_empty_name_in_a_language_has_no_address_in_it_even_when_the_site_keeps_empty_translations(string $name): void
+    {
+        // A site may let the translations hold empty texts and nulls.
+        $this->app->instance(Translatable::class, (new Translatable)->allowEmptyStringForTranslation()->allowNullForTranslation());
+        Language::query()->create(['code' => 'de', 'name' => 'Deutsch', 'sort' => 200]);
+        $about = $this->page('about', 'About us');
+        DB::table('pages')->where('id', $about->id)->update(['name' => '{"en":"About us","de":'.$name.'}']);
+        app(RecordCache::class)->flushAll();
+        $about = $about->fresh();
+        $tree = app(PageTree::class);
+
+        $this->assertNull($tree->url($about, 'de'));
+        $this->assertSame(['en' => url('/about')], $tree->urls($about));
+    }
+
+    public function test_the_tree_is_read_from_the_cache_once_for_the_whole_request(): void
+    {
+        $about = $this->page('about', 'About us');
+        $team = $this->page('team', 'Our team', $about);
+        $tree = app(PageTree::class);
+        $tree->flush();
+        $cache = app(RecordCache::class);
+        $cache->reset();
+
+        $tree->path($about);
+        $tree->path($team);
+        $tree->path($about);
+
+        $this->assertSame(['hits' => 0, 'misses' => 1], $cache->requestStats());
     }
 
     public function test_the_page_is_drawn_with_its_language_switch_breadcrumbs_and_text(): void
