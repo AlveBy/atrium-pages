@@ -63,7 +63,7 @@ final class StaticPageFileTest extends PlainTestCase
     public function test_the_components_are_named_once_each(): void
     {
         $component = fn (string $name): string => "<?\$APPLICATION->IncludeComponent(\n  \"{$name}\", \"\", []);?>";
-        $file = StaticPageFile::parse(self::HEAD.'<p>A</p>'.$component('bitrix:news.list').$component('bitrix:menu').$component('bitrix:news.list').self::FOOT);
+        $file = StaticPageFile::parse(self::HEAD.'<p>A</p>'.$component('bitrix:news.list').$component('bitrix:news.list').$component('bitrix:menu').self::FOOT);
 
         $this->assertSame(['bitrix:news.list', 'bitrix:menu'], $file->components);
         $this->assertSame('<p>A</p>', $file->content);
@@ -154,6 +154,7 @@ final class StaticPageFileTest extends PlainTestCase
             'no name' => ['<? $arDirProperties = []; ?>', ''],
             'a name that is not a string' => ['<? $sSectionName = $name; ?>', ''],
             'empty file' => ['', ''],
+            'a quote after a backslash and a line break' => ["<? \$sSectionName = \"One\\\nTwo\"; ?>", "One\nTwo"],
         ];
     }
 

@@ -112,6 +112,17 @@ final class ImportBitrixReportTest extends TestCase
         $this->assertRow($output, 'x/y/z.php', '/x/y/z', 'ok');
         $this->assertRow($output, 'x/y/', '/x/y', 'ok; a page listing the pages of the folder');
         $this->assertRow($output, 'a/b/index.php', '/a/b', 'ok');
+        $this->assertRow($output, 'a/', '/a', 'ok; a page listing the pages of the folder');
+    }
+
+    public function test_numbered_folders_are_imported_in_numeric_order(): void
+    {
+        $this->write('10/index.php', $this->page('Ten', '<p>Ten.</p>'));
+        $this->write('9/index.php', $this->page('Nine', '<p>Nine.</p>'));
+
+        $this->import();
+
+        $this->assertSame(['9', '10'], Page::query()->orderBy('id')->pluck('code')->all());
     }
 
     public function test_a_file_name_that_is_not_an_address_is_made_one(): void

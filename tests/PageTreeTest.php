@@ -15,6 +15,7 @@ use Atrium\Admin\Support\Sites;
 use Atrium\Pages\Http\Controllers\PageController;
 use Atrium\Pages\Models\Page;
 use Atrium\Pages\PageTree;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -84,6 +85,29 @@ final class PageTreeTest extends TestCase
         $this->assertSame(implode('/', array_map(fn (int $level): string => "l{$level}", range(1, 20))), $tree->path($pages[20]));
         $this->assertNull($tree->path($pages[21]));
         $this->assertCount(19, $tree->ancestors($pages[20]));
+    }
+
+    public function test_a_page_without_relatives_asks_the_database_for_none(): void
+    {
+        $about = $this->page('about', 'About us');
+        $tree = app(PageTree::class);
+        $tree->find('about');
+
+        DB::enableQueryLog();
+
+        $this->assertSame([], $tree->children($about)->all());
+        $this->assertSame([], $tree->ancestors($about)->all());
+        $this->assertSame([], DB::getQueryLog());
+    }
+
+    public function test_an_old_address_with_slashes_around_it_still_leads_to_the_page(): void
+    {
+        $this->page('about', 'About us');
+
+        $response = app(PageController::class)->show('/about.php/');
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(url('/about'), $response->getTargetUrl());
     }
 
     public function test_of_two_pages_on_one_path_the_first_in_order_opens(): void

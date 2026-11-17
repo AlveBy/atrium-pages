@@ -12,7 +12,9 @@ namespace Atrium\Pages\Tests;
 use Atrium\Admin\Fields\Field;
 use Atrium\Admin\Models\Site;
 use Atrium\Admin\Modules\Modules;
+use Atrium\Admin\Support\PublicUrl;
 use Atrium\Admin\Support\Sites;
+use Atrium\Pages\Fields\PageCodeField;
 use Atrium\Pages\Models\Page;
 use Atrium\Pages\PagesServiceProvider;
 use Atrium\Pages\Templates;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionMethod;
 
 /**
  * A page as the panel sees it, the templates it may be drawn with, the
@@ -63,6 +66,41 @@ final class PageModelTest extends TestCase
             ['id', 'name', 'code', 'sort', 'active', 'updated_at'],
             array_map(fn ($column): string => $column->getName(), Page::getAdministrationListColumns()),
         );
+    }
+
+    public function test_the_panel_hooks_are_public_and_the_seo_default_is_for_the_subclasses(): void
+    {
+        $this->assertTrue((new ReflectionMethod(Page::class, 'getAdminTabs'))->isPublic());
+        $this->assertTrue((new ReflectionMethod(Page::class, 'getAdministrationActions'))->isPublic());
+        $this->assertTrue((new ReflectionMethod(Page::class, 'getDefaultSeoDescription'))->isProtected());
+    }
+
+    public function test_the_code_field_keeps_every_rule_it_was_given(): void
+    {
+        $field = PageCodeField::make('code')->required()->rules(['filled']);
+
+        $this->assertSame(['required', 'filled', 'string', 'max:255', 'regex:'.PageCodeField::PATTERN], $field->getValidationRules());
+    }
+
+    public function test_the_cached_section_paths_follow_the_pages_saved_and_deleted(): void
+    {
+        $about = Page::query()->create(['code' => 'about', 'name' => ['en' => 'About']]);
+        $this->assertSame([$about->id => 'about'], PublicUrl::sectionPaths(Page::class));
+
+        $team = Page::query()->create(['code' => 'team', 'name' => ['en' => 'Team'], 'parent_id' => $about->id]);
+        $this->assertSame([$about->id => 'about', $team->id => 'about/team'], PublicUrl::sectionPaths(Page::class));
+
+        $team->delete();
+        $this->assertSame([$about->id => 'about'], PublicUrl::sectionPaths(Page::class));
+    }
+
+    public function test_a_code_sent_as_null_is_taken_for_an_empty_one(): void
+    {
+        Page::query()->create(['code' => '', 'name' => ['en' => 'Nameless']]);
+        $page = new Page(['name' => ['en' => 'New']]);
+
+        $this->expectException(ValidationException::class);
+        $page->transformAdminData(['code' => null]);
     }
 
     public function test_a_page_without_a_code_is_refused(): void
