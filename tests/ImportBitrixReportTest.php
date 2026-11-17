@@ -111,6 +111,7 @@ final class ImportBitrixReportTest extends TestCase
         $this->assertSame('a', Page::query()->where('code', 'b')->sole()->parent?->code);
         $this->assertRow($output, 'x/y/z.php', '/x/y/z', 'ok');
         $this->assertRow($output, 'x/y/', '/x/y', 'ok; a page listing the pages of the folder');
+        $this->assertRow($output, 'x/', '/x', 'ok; a page listing the pages of the folder');
         $this->assertRow($output, 'a/b/index.php', '/a/b', 'ok');
         $this->assertRow($output, 'a/', '/a', 'ok; a page listing the pages of the folder');
     }

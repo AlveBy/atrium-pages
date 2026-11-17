@@ -127,6 +127,7 @@ final class StaticPageFileTest extends PlainTestCase
             'windows-1251, found by itself' => ['Windows-1251', null],
             'windows-1251, given' => ['Windows-1251', 'Windows-1251'],
             'windows-1251, given by another name' => ['Windows-1251', 'CP1251'],
+            'UTF-7, one letter from UTF-8' => ['UTF-7', 'UTF-7'],
         ];
     }
 
