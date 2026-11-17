@@ -57,8 +57,11 @@ final class StaticPageFile
         $properties = [];
 
         foreach (['SetPageProperty', 'SetDirProperty'] as $method) {
-            foreach (self::calls($source, $method) as [$name, $value]) {
-                $properties[mb_strtolower($name)] = $value;
+            foreach (self::calls($source, $method) as $arguments) {
+                // A call that names a property without a value sets nothing.
+                if (isset($arguments[1])) {
+                    $properties[mb_strtolower($arguments[0])] = $arguments[1];
+                }
             }
         }
 

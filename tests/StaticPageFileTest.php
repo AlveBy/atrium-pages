@@ -79,6 +79,19 @@ final class StaticPageFileTest extends PlainTestCase
         $this->assertSame(['description' => 'Who we are', 'описание' => 'Кто мы'], $file->properties);
     }
 
+    public function test_a_property_call_with_one_argument_is_skipped_and_the_others_are_read(): void
+    {
+        $file = StaticPageFile::parse("<?\nrequire(\"/bitrix/header.php\");\n"
+            ."\$APPLICATION->SetPageProperty(\"title\");\n"
+            ."\$APPLICATION->SetDirProperty('keywords');\n"
+            ."\$APPLICATION->SetPageProperty(\"description\", \"Who we are\");\n"
+            .'?>Text');
+
+        $this->assertTrue($file->isPage);
+        $this->assertSame(['description' => 'Who we are'], $file->properties);
+        $this->assertSame('Text', $file->content);
+    }
+
     /**
      * @return array<string,array{0:string,1:string}>
      */
