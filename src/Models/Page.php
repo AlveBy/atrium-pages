@@ -30,6 +30,7 @@ use Atrium\Admin\Traits\HasAdminSeo;
 use Atrium\Admin\Traits\HasAdminTabs;
 use Atrium\Admin\Traits\InteractsWithAdmin;
 use Atrium\Admin\Traits\Translatable;
+use Atrium\Pages\Actions\ChangeVisibility;
 use Atrium\Pages\Fields\PageCodeField;
 use Atrium\Pages\PageTree;
 use Atrium\Pages\Templates;
@@ -168,6 +169,19 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Site
     {
         return [
             CreateFromRecord::make('subpage')->label(__('atrium-pages::pages.actions.subpage'))->fill(['parent_id' => 'id']),
+        ];
+    }
+
+    /**
+     * Over the pages checked in the list: show them on the site or hide them.
+     *
+     * @return array<int,ChangeVisibility>
+     */
+    public static function getAdministrationBulkActions(): array
+    {
+        return [
+            ChangeVisibility::make('show')->label(__('atrium-pages::pages.actions.show'))->to(true),
+            ChangeVisibility::make('hide')->label(__('atrium-pages::pages.actions.hide'))->to(false),
         ];
     }
 

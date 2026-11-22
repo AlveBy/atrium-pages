@@ -14,6 +14,10 @@ return [
     'root' => 'Yuqori daraja',
     'actions' => [
         'subpage' => 'Ichki sahifa',
+        'show' => 'Ko\'rsatish',
+        'hide' => 'Yashirish',
+        'shown' => ':count ta sahifa saytda ko\'rsatildi.',
+        'hidden' => ':count ta sahifa saytdan yashirildi.',
     ],
     'fields' => [
         'name' => 'Nomi',

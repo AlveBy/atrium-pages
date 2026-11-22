@@ -14,6 +14,10 @@ return [
     'root' => '顶层',
     'actions' => [
         'subpage' => '子页面',
+        'show' => '显示',
+        'hide' => '隐藏',
+        'shown' => '已在网站上显示 :count 个页面。',
+        'hidden' => '已在网站上隐藏 :count 个页面。',
     ],
     'fields' => [
         'name' => '名称',

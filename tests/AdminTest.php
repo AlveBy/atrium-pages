@@ -11,6 +11,7 @@ namespace Atrium\Pages\Tests;
 
 use Atrium\Admin\Models\AdminRole;
 use Atrium\Admin\Models\AdminUser;
+use Atrium\Pages\Actions\ChangeVisibility;
 use Atrium\Pages\Models\Page;
 use Inertia\Testing\AssertableInertia;
 
@@ -159,7 +160,7 @@ final class AdminTest extends TestCase
     public function test_a_subpage_is_added_from_its_parent(): void
     {
         $about = Page::query()->create(['name' => 'About us', 'code' => 'about']);
-        $subpage = ['name' => 'subpage', 'label' => 'Subpage', 'fill' => ['parent_id' => 'id']];
+        $subpage = ['type' => 'create', 'name' => 'subpage', 'label' => 'Subpage', 'fill' => ['parent_id' => 'id']];
 
         $this->actingAs($this->admin(), 'admin')
             ->get('/admin/pages')
@@ -189,5 +190,46 @@ final class AdminTest extends TestCase
             ->get("/admin/pages/{$about->id}/edit")
             ->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page->where('actions', []));
+    }
+
+    public function test_selected_pages_are_hidden_and_shown_together(): void
+    {
+        [$about, $contacts, $news] = array_map(fn (string $code) => Page::query()->create(['name' => ucfirst($code), 'code' => $code, 'active' => true]), ['about', 'contacts', 'news']);
+        $this->actingAs($this->admin(), 'admin');
+
+        $this->get('/admin/pages')->assertOk()->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('bulkActions.1', ['type' => 'bulk', 'name' => 'show', 'label' => 'Show', 'confirm' => null])
+            ->where('bulkActions.2', ['type' => 'bulk', 'name' => 'hide', 'label' => 'Hide', 'confirm' => null]));
+
+        $this->post('/admin/pages/bulk/hide', ['ids' => [$about->id, $contacts->id]])
+            ->assertSessionHas('success', '2 pages are hidden from the site.');
+        $this->assertSame([false, false, true], [$about->fresh()->active, $contacts->fresh()->active, $news->fresh()->active]);
+
+        $this->post('/admin/pages/bulk/show', ['ids' => [$contacts->id]])
+            ->assertSessionHas('success', '1 page is shown on the site.');
+        $this->assertSame([false, true, true], [$about->fresh()->active, $contacts->fresh()->active, $news->fresh()->active]);
+    }
+
+    public function test_hiding_pages_needs_the_right_to_edit_them(): void
+    {
+        $page = Page::query()->create(['name' => 'About', 'code' => 'about', 'active' => true]);
+        $editor = AdminUser::query()->create(['name' => 'Reader', 'email' => 'reader@example.com', 'password' => 'secret-password', 'is_active' => true]);
+        $editor->roles()->attach(AdminRole::query()->create(['name' => 'Reader', 'permissions' => ['pages.view']]));
+
+        $this->actingAs($editor, 'admin')->get('/admin/pages')->assertOk()
+            ->assertInertia(fn (AssertableInertia $inertia) => $inertia->where('bulkActions', []));
+        $this->post('/admin/pages/bulk/hide', ['ids' => [$page->id]])->assertForbidden();
+
+        $this->assertTrue($page->fresh()->active);
+    }
+
+    public function test_the_visibility_action_shows_unless_told_otherwise(): void
+    {
+        $page = Page::query()->create(['name' => 'About', 'code' => 'about', 'active' => false]);
+
+        $result = ChangeVisibility::make('show')->handle(Page::query()->get());
+
+        $this->assertSame('1 page is shown on the site.', $result->message());
+        $this->assertTrue($page->fresh()->active);
     }
 }

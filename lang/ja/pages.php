@@ -14,6 +14,10 @@ return [
     'root' => '最上位',
     'actions' => [
         'subpage' => 'サブページ',
+        'show' => '表示',
+        'hide' => '非表示',
+        'shown' => ':count 件のページをサイトに表示しました。',
+        'hidden' => ':count 件のページをサイトから非表示にしました。',
     ],
     'fields' => [
         'name' => '名前',

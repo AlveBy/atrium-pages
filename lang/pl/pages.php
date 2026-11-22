@@ -14,6 +14,10 @@ return [
     'root' => 'Najwyższy poziom',
     'actions' => [
         'subpage' => 'Podstrona',
+        'show' => 'Pokaż',
+        'hide' => 'Ukryj',
+        'shown' => 'Pokazano na stronie :count podstronę.|Pokazano na stronie :count podstrony.|Pokazano na stronie :count podstron.',
+        'hidden' => 'Ukryto :count podstronę.|Ukryto :count podstrony.|Ukryto :count podstron.',
     ],
     'fields' => [
         'name' => 'Nazwa',

@@ -14,6 +14,10 @@ return [
     'root' => 'Nível superior',
     'actions' => [
         'subpage' => 'Subpágina',
+        'show' => 'Mostrar',
+        'hide' => 'Ocultar',
+        'shown' => ':count página está visível no site.|:count páginas estão visíveis no site.',
+        'hidden' => ':count página está oculta no site.|:count páginas estão ocultas no site.',
     ],
     'fields' => [
         'name' => 'Nome',

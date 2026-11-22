@@ -14,6 +14,10 @@ return [
     'root' => 'Oberste Ebene',
     'actions' => [
         'subpage' => 'Unterseite',
+        'show' => 'Anzeigen',
+        'hide' => 'Ausblenden',
+        'shown' => ':count Seite wird auf der Website angezeigt.|:count Seiten werden auf der Website angezeigt.',
+        'hidden' => ':count Seite ist auf der Website ausgeblendet.|:count Seiten sind auf der Website ausgeblendet.',
     ],
     'fields' => [
         'name' => 'Name',

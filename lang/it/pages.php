@@ -14,6 +14,10 @@ return [
     'root' => 'Livello superiore',
     'actions' => [
         'subpage' => 'Sottopagina',
+        'show' => 'Mostra',
+        'hide' => 'Nascondi',
+        'shown' => ':count pagina è visibile sul sito.|:count pagine sono visibili sul sito.',
+        'hidden' => ':count pagina è nascosta dal sito.|:count pagine sono nascoste dal sito.',
     ],
     'fields' => [
         'name' => 'Nome',

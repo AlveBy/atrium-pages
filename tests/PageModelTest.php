@@ -72,6 +72,9 @@ final class PageModelTest extends TestCase
     {
         $this->assertTrue((new ReflectionMethod(Page::class, 'getAdminTabs'))->isPublic());
         $this->assertTrue((new ReflectionMethod(Page::class, 'getAdministrationActions'))->isPublic());
+        // Called from other packages; Eloquent's __callStatic would hide a protected one.
+        $this->assertTrue((new ReflectionMethod(Page::class, 'getAdministrationBulkActions'))->isPublic());
+        $this->assertCount(2, Page::getAdministrationBulkActions());
         $this->assertTrue((new ReflectionMethod(Page::class, 'getDefaultSeoDescription'))->isProtected());
     }
 

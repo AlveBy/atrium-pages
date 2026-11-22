@@ -13,6 +13,10 @@ return [
     'root' => 'Top level',
     'actions' => [
         'subpage' => 'Subpage',
+        'show' => 'Show',
+        'hide' => 'Hide',
+        'shown' => ':count page is shown on the site.|:count pages are shown on the site.',
+        'hidden' => ':count page is hidden from the site.|:count pages are hidden from the site.',
     ],
     'fields' => [
         'name' => 'Name',

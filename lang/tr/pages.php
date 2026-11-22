@@ -14,6 +14,10 @@ return [
     'root' => 'Üst düzey',
     'actions' => [
         'subpage' => 'Alt sayfa',
+        'show' => 'Göster',
+        'hide' => 'Gizle',
+        'shown' => ':count sayfa sitede gösteriliyor.',
+        'hidden' => ':count sayfa siteden gizlendi.',
     ],
     'fields' => [
         'name' => 'Ad',
