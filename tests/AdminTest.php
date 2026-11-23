@@ -38,6 +38,20 @@ final class AdminTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page->component('Admin/Resource/Create'));
     }
 
+    public function test_the_list_shows_only_the_shown_or_only_the_hidden_pages(): void
+    {
+        Page::query()->create(['name' => 'About us', 'code' => 'about', 'active' => true]);
+        Page::query()->create(['name' => 'Draft', 'code' => 'draft', 'active' => false]);
+        $this->actingAs($this->admin(), 'admin');
+
+        $this->get('/admin/pages')->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('filterControls', [['name' => 'active', 'type' => 'boolean', 'label' => 'Active', 'options' => [['value' => '1', 'label' => 'Yes'], ['value' => '0', 'label' => 'No']]]])
+            ->where('items.total', 2));
+        $this->get('/admin/pages?active=0')->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('items.total', 1)
+            ->where('items.data.0.code', 'draft'));
+    }
+
     public function test_an_editor_creates_edits_and_deletes_a_page(): void
     {
         $this->actingAs($this->admin(), 'admin')

@@ -24,6 +24,7 @@ use Atrium\Admin\Fields\NumberField;
 use Atrium\Admin\Fields\SelectField;
 use Atrium\Admin\Fields\TextField;
 use Atrium\Admin\Fields\TreeSelectField;
+use Atrium\Admin\Filters\BooleanFilter;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Admin\Traits\BelongsToSite;
 use Atrium\Admin\Traits\HasAdminSeo;
@@ -183,6 +184,14 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Site
             ChangeVisibility::make('show')->label(__('atrium-pages::pages.actions.show'))->to(true),
             ChangeVisibility::make('hide')->label(__('atrium-pages::pages.actions.hide'))->to(false),
         ];
+    }
+
+    /**
+     * Shown or hidden pages only: the filter above the list.
+     */
+    public static function getAdministrationFilters(): array
+    {
+        return [BooleanFilter::make('active')->label(__('atrium::fields.standard.active'))];
     }
 
     public static function getAdministrationListColumns(): array
