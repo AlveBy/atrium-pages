@@ -158,7 +158,7 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Site
             SelectField::make('template')->label(__('atrium-pages::pages.fields.template'))
                 ->options(Templates::options())->default(Templates::DEFAULT)->required(),
             NumberField::make('sort')->label(__('atrium::fields.standard.sort'))->default(500),
-            ContentField::make('content')->label(__('atrium-pages::pages.fields.content'))->defaultMode('html'),
+            ContentField::make('content')->label(__('atrium-pages::pages.fields.content'))->defaultMode('html')->ai(),
         ];
     }
 
