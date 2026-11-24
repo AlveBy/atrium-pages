@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Tests;
 
+use Atrium\Admin\History\Trash;
 use Atrium\Admin\Models\AdminRole;
 use Atrium\Admin\Models\AdminUser;
+use Atrium\Admin\Models\TrashedRecord;
 use Atrium\Admin\Templates\RecordTemplate;
 use Atrium\Pages\Actions\ChangeVisibility;
 use Atrium\Pages\Models\Page;
@@ -173,7 +175,9 @@ final class AdminTest extends TestCase
         $team = Page::query()->create(['name' => 'Team', 'code' => 'team', 'parent_id' => $about->id]);
 
         $this->actingAs($this->admin(), 'admin')->delete("/admin/pages/{$about->id}");
+        $this->assertSame($about->id, $team->fresh()->parent_id, 'A page in the trash keeps its children.');
 
+        app(Trash::class)->purge(TrashedRecord::query()->sole());
         $this->assertNull($team->fresh()->parent_id);
     }
 
