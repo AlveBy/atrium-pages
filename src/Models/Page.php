@@ -26,6 +26,7 @@ use Atrium\Admin\Fields\TextField;
 use Atrium\Admin\Fields\TreeSelectField;
 use Atrium\Admin\Filters\BooleanFilter;
 use Atrium\Admin\Support\PublicUrl;
+use Atrium\Admin\Templates\OwnsTemplateColumn;
 use Atrium\Admin\Traits\BelongsToSite;
 use Atrium\Admin\Traits\HasAdminSeo;
 use Atrium\Admin\Traits\HasAdminTabs;
@@ -58,7 +59,7 @@ use Illuminate\Validation\ValidationException;
  * @property int $sort
  * @property string|null $source
  */
-class Page extends Model implements Administrable, Cacheable, HasSeoFields, Sitemapable
+class Page extends Model implements Administrable, Cacheable, HasSeoFields, OwnsTemplateColumn, Sitemapable
 {
     use BelongsToSite, CachesRecords, HasAdminSeo, HasAdminTabs, InteractsWithAdmin, Translatable;
 
@@ -136,6 +137,15 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Site
     public static function getDefaultSortDirection(): string
     {
         return 'asc';
+    }
+
+    /**
+     * The template is a column of the page, not a row of the record
+     * templates: the core leaves the field to the form below.
+     */
+    public static function templateColumn(): string
+    {
+        return 'template';
     }
 
     public static function getAdminTabs(): array

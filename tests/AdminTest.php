@@ -11,6 +11,7 @@ namespace Atrium\Pages\Tests;
 
 use Atrium\Admin\Models\AdminRole;
 use Atrium\Admin\Models\AdminUser;
+use Atrium\Admin\Templates\RecordTemplate;
 use Atrium\Pages\Actions\ChangeVisibility;
 use Atrium\Pages\Models\Page;
 use Inertia\Testing\AssertableInertia;
@@ -135,6 +136,25 @@ final class AdminTest extends TestCase
         $this->actingAs($this->admin(), 'admin')
             ->post('/admin/pages', ['name' => ['en' => 'About'], 'code' => 'about', 'template' => 'nope'])
             ->assertSessionHasErrors('template');
+    }
+
+    public function test_the_form_offers_the_templates_of_the_theme_once_and_saves_the_choice_in_the_page(): void
+    {
+        $page = Page::query()->create(['code' => 'about', 'name' => ['en' => 'About']]);
+        $this->actingAs($this->admin(), 'admin')
+            ->get("/admin/pages/{$page->id}/edit")
+            ->assertOk()
+            ->assertInertia(function (AssertableInertia $inertia): void {
+                $fields = collect($inertia->toArray()['props']['fields']);
+                $this->assertSame(1, $fields->where('name', 'template')->count());
+                $this->assertContains('full-width', array_column($fields->firstWhere('name', 'template')['options'], 'value'));
+            });
+
+        $this->put("/admin/pages/{$page->id}", ['name' => ['en' => 'About'], 'code' => 'about', 'template' => 'full-width', 'active' => true, 'sort' => 100])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('full-width', $page->fresh()->template);
+        $this->assertSame(0, RecordTemplate::query()->count());
     }
 
     public function test_a_page_cannot_be_its_own_parent(): void

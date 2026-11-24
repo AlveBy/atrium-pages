@@ -12,7 +12,9 @@ namespace Atrium\Pages\Tests;
 use Atrium\Admin\Models\Language;
 use Atrium\Admin\Models\Site;
 use Atrium\Admin\Support\Sites;
+use Atrium\Admin\Templates\Templates as RecordTemplates;
 use Atrium\Pages\Models\Page;
+use Atrium\Pages\Templates;
 
 /**
  * A page opens at the path of its codes from the root of the site, inside
@@ -94,6 +96,42 @@ final class PublicPagesTest extends TestCase
 
         // A template gone from the config falls back to the default one.
         $this->about->update(['template' => 'removed']);
+
+        $this->get('/about')->assertOk()->assertSee('<h1>About us</h1>', false);
+    }
+
+    public function test_the_themes_full_width_template_draws_a_page_across_the_window(): void
+    {
+        $this->get('/about')->assertOk()->assertSee('<main id="content" class="wrap">', false);
+
+        $this->about->update(['template' => 'full-width']);
+
+        $this->get('/about')
+            ->assertOk()
+            ->assertViewIs('atrium-theme::templates.all.full-width')
+            ->assertViewHas('defaultView', 'atrium-pages::templates.default')
+            ->assertSee('<main id="content" class="wrap-full">', false)
+            ->assertSee('<h1>About us</h1>', false);
+    }
+
+    public function test_a_template_file_of_the_site_draws_a_page_and_a_deleted_one_the_default(): void
+    {
+        $views = sys_get_temp_dir().'/atrium-pages-site-'.uniqid();
+        mkdir($views.'/templates/pages', 0777, true);
+        file_put_contents($views.'/templates/pages/press.blade.php', "{{-- Template: Press --}}\n<p class=\"press\">{{ \$title }}</p>");
+        view()->addLocation($views);
+        app(RecordTemplates::class)->forget();
+
+        $this->about->update(['template' => 'press']);
+        $this->assertSame('Press', Templates::options()['press']);
+        $this->get('/about')->assertOk()->assertSee('<p class="press">About us</p>', false);
+
+        unlink($views.'/templates/pages/press.blade.php');
+        rmdir($views.'/templates/pages');
+        rmdir($views.'/templates');
+        rmdir($views);
+        view()->getFinder()->flush();
+        app(RecordTemplates::class)->forget();
 
         $this->get('/about')->assertOk()->assertSee('<h1>About us</h1>', false);
     }

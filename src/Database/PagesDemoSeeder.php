@@ -53,7 +53,7 @@ final class PagesDemoSeeder extends DemoSeeder
             'ru' => ['Доставка и оплата', '<p>По городу доставляем за два-три рабочих дня, по стране — до недели. Оплатить можно картой на сайте или картой и наличными при получении.</p>'],
         ]);
 
-        $this->page($site->id, null, 'contacts', 300, 'default', [
+        $this->page($site->id, null, 'contacts', 300, 'full-width', [
             'en' => ['Contacts', '<p>12 Market Street, Old Town<br>+1 555 0100<br>centre@example.com</p><p>Open daily from 10:00 to 20:00.</p>'],
             'de' => ['Kontakt', '<p>12 Market Street, Altstadt<br>+1 555 0100<br>centre@example.com</p><p>Täglich von 10:00 bis 20:00 Uhr geöffnet.</p>'],
             'ru' => ['Контакты', '<p>12 Market Street, Старый город<br>+1 555 0100<br>centre@example.com</p><p>Работаем ежедневно с 10:00 до 20:00.</p>'],

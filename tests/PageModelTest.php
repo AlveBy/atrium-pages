@@ -18,6 +18,7 @@ use Atrium\Pages\Fields\PageCodeField;
 use Atrium\Pages\Models\Page;
 use Atrium\Pages\PagesServiceProvider;
 use Atrium\Pages\Templates;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
@@ -146,10 +147,10 @@ final class PageModelTest extends TestCase
     public static function templateLists(): array
     {
         return [
-            'the configured ones' => [['default' => 'v.default', 'wide' => 'v.wide'], ['default' => 'v.default', 'wide' => 'v.wide']],
-            'not a view: left out' => [['default' => 'v.default', 'broken' => ['v.x'], 'number' => 5], ['default' => 'v.default']],
-            'none: the default one' => [[], ['default' => 'atrium-pages::templates.default']],
-            'nothing usable: the default one' => [['broken' => null], ['default' => 'atrium-pages::templates.default']],
+            'the configured ones' => [['default' => 'v.default', 'wide' => 'v.wide'], ['default' => 'v.default', 'wide' => 'v.wide', 'full-width' => 'atrium-theme::templates.all.full-width']],
+            'not a view: left out' => [['default' => 'v.default', 'broken' => ['v.x'], 'number' => 5], ['default' => 'v.default', 'full-width' => 'atrium-theme::templates.all.full-width']],
+            'none: the default one' => [[], ['default' => 'atrium-pages::templates.default', 'full-width' => 'atrium-theme::templates.all.full-width']],
+            'nothing usable: the default one' => [['broken' => null], ['default' => 'atrium-pages::templates.default', 'full-width' => 'atrium-theme::templates.all.full-width']],
         ];
     }
 
@@ -164,22 +165,31 @@ final class PageModelTest extends TestCase
         $this->assertSame($expected, Templates::all());
     }
 
-    public function test_an_unknown_template_is_drawn_with_the_default_one_else_the_first(): void
+    public function test_an_unknown_template_is_drawn_with_the_default_one(): void
     {
+        $views = sys_get_temp_dir().'/atrium-pages-'.uniqid();
+        mkdir($views.'/v', 0777, true);
+        file_put_contents($views.'/v/wide.blade.php', 'wide');
+        file_put_contents($views.'/v/default.blade.php', 'default');
+        view()->addLocation($views);
         config(['atrium-pages.templates' => ['wide' => 'v.wide', 'default' => 'v.default']]);
         $this->assertSame('v.wide', Templates::view('wide'));
         $this->assertSame('v.default', Templates::view('removed'));
         $this->assertSame('v.default', Templates::view(null));
 
-        config(['atrium-pages.templates' => ['wide' => 'v.wide', 'narrow' => 'v.narrow']]);
-        $this->assertSame('v.wide', Templates::view('removed'));
+        unlink($views.'/v/wide.blade.php');
+        view()->getFinder()->flush();
+        app(\Atrium\Admin\Templates\Templates::class)->forget();
+        $this->assertSame('v.default', Templates::view('wide'), 'a template whose file is gone is the default one');
+
+        (new Filesystem)->deleteDirectory($views);
     }
 
     public function test_a_template_is_labelled_by_its_translation_else_by_its_key(): void
     {
         config(['atrium-pages.templates' => ['default' => 'v.default', 'my_landing' => 'v.landing']]);
 
-        $this->assertSame(['default' => 'Page', 'my_landing' => 'My Landing'], Templates::options());
+        $this->assertSame(['default' => 'Page', 'my_landing' => 'My Landing', 'full-width' => 'Full width'], Templates::options());
     }
 
     public function test_the_demo_pages_belong_to_the_default_site_in_the_editors_order(): void

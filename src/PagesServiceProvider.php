@@ -33,6 +33,7 @@ final class PagesServiceProvider extends ServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'atrium-pages');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'atrium-pages');
+        Templates::source();
 
         // Not installed, the module has no table: every unknown address
         // would fail instead of being a 404.

@@ -41,7 +41,12 @@ final class DemoTest extends TestCase
             ->assertSee('<title>About us | Demo site</title>', false)
             ->assertSeeInOrder(['About us', 'Our team', 'Our history']);
 
-        $this->get('/contacts')->assertOk()->assertSee('12 Market Street');
+        $this->get('/contacts')
+            ->assertOk()
+            ->assertSee('12 Market Street')
+            ->assertSee('<main id="content" class="wrap-full">', false);
+        $this->get('/about')->assertOk()->assertSee('<main id="content" class="wrap">', false);
+        $this->assertSame('full-width', Page::query()->where('code', 'contacts')->value('template'));
 
         Language::query()->create(['code' => 'ru', 'name' => 'Русский']);
 

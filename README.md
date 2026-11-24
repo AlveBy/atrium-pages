@@ -55,6 +55,8 @@ Add your own in `config/atrium-pages.php` (`php artisan vendor:publish --tag=atr
 ],
 ```
 
+Templates are also found as files, the same way as for every module: a Blade file in `resources/views/templates/pages/` (or `templates/all/` for all modules) whose first line is `{{-- Template: Press page --}}` is offered in the form as it is, and the theme's **Full width** (`templates/all/full-width`) is offered for pages too. The demo's contacts page uses it. How: [Page templates](../../docs/modules.md#page-templates). The choice stays in the page's `template` column.
+
 A view gets `$page` (the model), `$title`, `$content`, `$children` (`title`, `url` and `text` of each visible subpage) and the layout's `canonical`, `breadcrumbs`, `alternates` and `switch`; it usually `@extends('atrium-theme::layout')`. The label in the form is the translation `atrium-pages::pages.templates.{key}`, or the key itself. A page whose template is gone from the config is drawn with `default`.
 
 ## Change the look

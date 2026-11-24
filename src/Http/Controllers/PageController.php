@@ -75,6 +75,7 @@ final class PageController extends Controller
 
         return view(Templates::view($page->template), [
             'page' => $page,
+            'defaultView' => Templates::defaultView(),
             'title' => $page->name,
             'content' => $content === '' ? null : new HtmlString($content),
             'children' => $children,
