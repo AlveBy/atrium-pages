@@ -189,10 +189,10 @@ final class AdminTest extends TestCase
         $this->actingAs($this->admin(), 'admin')
             ->get('/admin/pages/create')
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->where('fields.2.name', 'code')
-                ->where('fields.2.publicPrefix', '')
-                ->where('fields.2.parentField', 'parent_id')
-                ->where("fields.2.parentPaths.{$about->id}", 'about'));
+                ->where('fields.4.name', 'code')
+                ->where('fields.4.publicPrefix', '')
+                ->where('fields.4.parentField', 'parent_id')
+                ->where("fields.4.parentPaths.{$about->id}", 'about'));
     }
 
     public function test_a_subpage_is_added_from_its_parent(): void
