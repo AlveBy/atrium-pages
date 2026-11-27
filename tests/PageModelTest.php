@@ -51,7 +51,7 @@ final class PageModelTest extends TestCase
     {
         $fields = $this->byName(Page::getAdministrationFields());
 
-        $this->assertSame(['active', 'name', 'code', 'parent_id', 'template', 'sort', 'content'], array_keys($fields));
+        $this->assertSame(['active', 'name', 'code', 'parent_id', 'template', 'sort', 'content', 'layout'], array_keys($fields));
         $this->assertTrue($fields['active']->getDefault());
         $this->assertContains('max:255', $fields['name']->getValidationRules());
         $this->assertNotContains('max:254', $fields['name']->getValidationRules());

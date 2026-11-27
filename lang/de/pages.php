@@ -25,10 +25,12 @@ return [
         'parent' => 'Übergeordnete Seite',
         'template' => 'Vorlage',
         'content' => 'Text',
+        'layout' => 'Abschnitte und Blöcke',
         'updated_at' => 'Geändert',
     ],
     'hints' => [
         'code' => 'Der letzte Teil der Seitenadresse. Seiten unter derselben übergeordneten Seite brauchen verschiedene.',
+        'layout' => 'Eine Seite mit Abschnitten wird aus ihnen angezeigt, nicht aus dem Text. Löschen Sie alle Abschnitte, um wieder den Text anzuzeigen.',
     ],
     'templates' => [
         'default' => 'Seite',

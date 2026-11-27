@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Http\Controllers;
 
+use Atrium\Admin\Builder\Layout;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Pages\Models\Page;
 use Atrium\Pages\PageTree;
 use Atrium\Pages\Templates;
+use Atrium\Theme\Builder\LayoutRenderer;
 use Atrium\Theme\Pages as ThemePages;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -30,6 +32,7 @@ final class PageController extends Controller
         private readonly PageTree $tree,
         private readonly ContentLanguages $languages,
         private readonly ThemePages $theme,
+        private readonly LayoutRenderer $layouts,
     ) {}
 
     public function show(string $path): View|RedirectResponse
@@ -71,13 +74,21 @@ final class PageController extends Controller
             ->values()
             ->all();
 
-        $content = trim((string) $page->content);
+        // A page with sections is drawn from them, any other from its text.
+        $sections = Layout::sections($page->layout);
+        $text = trim((string) $page->content);
+        $content = match (true) {
+            $sections !== [] => $this->layouts->render($sections),
+            $text !== '' => new HtmlString($text),
+            default => null,
+        };
 
         return view(Templates::view($page->template), [
             'page' => $page,
             'defaultView' => Templates::defaultView(),
             'title' => $page->name,
-            'content' => $content === '' ? null : new HtmlString($content),
+            'content' => $content,
+            'built' => $sections !== [],
             'children' => $children,
             'canonical' => $url,
             'breadcrumbs' => $breadcrumbs,

@@ -25,10 +25,12 @@ return [
         'parent' => 'Pagina padre',
         'template' => 'Modello',
         'content' => 'Testo',
+        'layout' => 'Sezioni e blocchi',
         'updated_at' => 'Modificata',
     ],
     'hints' => [
         'code' => 'L\'ultima parte dell\'indirizzo della pagina. Le pagine sotto lo stesso padre devono averne di diversi.',
+        'layout' => 'Una pagina con sezioni viene mostrata a partire da esse e non dal testo. Elimina tutte le sezioni per mostrare di nuovo il testo.',
     ],
     'templates' => [
         'default' => 'Pagina',

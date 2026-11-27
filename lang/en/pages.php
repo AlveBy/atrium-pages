@@ -24,10 +24,12 @@ return [
         'parent' => 'Parent page',
         'template' => 'Template',
         'content' => 'Text',
+        'layout' => 'Sections and blocks',
         'updated_at' => 'Updated',
     ],
     'hints' => [
         'code' => 'The last part of the page address. Pages under one parent need different ones.',
+        'layout' => 'A page with sections is shown from them instead of the text. Delete every section to show the text again.',
     ],
     'templates' => [
         'default' => 'Page',

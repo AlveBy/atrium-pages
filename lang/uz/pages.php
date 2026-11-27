@@ -25,10 +25,12 @@ return [
         'parent' => 'Ota sahifa',
         'template' => 'Shablon',
         'content' => 'Matn',
+        'layout' => 'Seksiyalar va bloklar',
         'updated_at' => 'O\'zgartirilgan',
     ],
     'hints' => [
         'code' => 'Sahifa manzilining oxirgi qismi. Bitta ota sahifa ichidagi sahifalarning manzillari har xil bo\'lishi kerak.',
+        'layout' => 'Seksiyalari bor sahifa matn oʻrniga ulardan koʻrsatiladi. Matnni yana koʻrsatish uchun barcha seksiyalarni oʻchiring.',
     ],
     'templates' => [
         'default' => 'Sahifa',

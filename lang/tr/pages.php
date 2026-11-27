@@ -25,10 +25,12 @@ return [
         'parent' => 'Üst sayfa',
         'template' => 'Şablon',
         'content' => 'Metin',
+        'layout' => 'Bölümler ve bloklar',
         'updated_at' => 'Güncellendi',
     ],
     'hints' => [
         'code' => 'Sayfa adresinin son kısmı. Aynı üst sayfanın altındaki sayfaların adresleri farklı olmalıdır.',
+        'layout' => 'Bölümleri olan sayfa metinden değil, bölümlerden gösterilir. Metni yeniden göstermek için tüm bölümleri silin.',
     ],
     'templates' => [
         'default' => 'Sayfa',

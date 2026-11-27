@@ -25,10 +25,12 @@ return [
         'parent' => 'Strona nadrzędna',
         'template' => 'Szablon',
         'content' => 'Tekst',
+        'layout' => 'Sekcje i bloki',
         'updated_at' => 'Zmieniona',
     ],
     'hints' => [
         'code' => 'Ostatnia część adresu strony. Strony w obrębie jednej strony nadrzędnej muszą mieć różne adresy.',
+        'layout' => 'Strona z sekcjami jest wyświetlana z nich, a nie z tekstu. Usuń wszystkie sekcje, aby znów wyświetlać tekst.',
     ],
     'templates' => [
         'default' => 'Strona',

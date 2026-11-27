@@ -16,6 +16,7 @@ Add `--demo` to fill it with a shop's pages (about us with two subpages, deliver
 - The name and the text are written per content language; only the default language is required. The code is one for all languages: `/about` and `/de/about`.
 - Pages belong to a site: each site has its own tree.
 - Pages under one parent need different codes. A code may have capitals and underscores, so moved pages keep addresses like `/price_list`.
+- **Sections and blocks** under the text build the page from blocks instead: text, picture, gallery, button, map, a form, a menu, a reusable block. A page with at least one section is shown from them ([the site builder](../../docs/site-builder.md)).
 - "Subpage", in a page's row and on its form, opens a new page with that page as its parent.
 - Deleting a page moves its subpages up to its parent.
 
@@ -57,7 +58,7 @@ Add your own in `config/atrium-pages.php` (`php artisan vendor:publish --tag=atr
 
 Templates are also found as files, the same way as for every module: a Blade file in `resources/views/templates/pages/` (or `templates/all/` for all modules) whose first line is `{{-- Template: Press page --}}` is offered in the form as it is, and the theme's **Full width** (`templates/all/full-width`) is offered for pages too. The demo's contacts page uses it. How: [Page templates](../../docs/modules.md#page-templates). The choice stays in the page's `template` column.
 
-A view gets `$page` (the model), `$title`, `$content`, `$children` (`title`, `url` and `text` of each visible subpage) and the layout's `canonical`, `breadcrumbs`, `alternates` and `switch`; it usually `@extends('atrium-theme::layout')`. The label in the form is the translation `atrium-pages::pages.templates.{key}`, or the key itself. A page whose template is gone from the config is drawn with `default`.
+A view gets `$page` (the model), `$title`, `$content` (the text, or the drawn blocks, and then `$built` is true), `$children` (`title`, `url` and `text` of each visible subpage) and the layout's `canonical`, `breadcrumbs`, `alternates` and `switch`; it usually `@extends('atrium-theme::layout')`. The label in the form is the translation `atrium-pages::pages.templates.{key}`, or the key itself. A page whose template is gone from the config is drawn with `default`.
 
 ## Change the look
 

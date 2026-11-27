@@ -14,6 +14,10 @@
     'breadcrumbs' => [],
 ])
 
+@if ($built ?? false)
+    @section('main-class', 'main-builder')
+@endif
+
 @section('content')
     <article class="page page-{{ $page->template }}">
         @if ($content)

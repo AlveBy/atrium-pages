@@ -25,10 +25,12 @@ return [
         'parent' => 'Página padre',
         'template' => 'Plantilla',
         'content' => 'Texto',
+        'layout' => 'Secciones y bloques',
         'updated_at' => 'Modificada',
     ],
     'hints' => [
         'code' => 'La última parte de la dirección de la página. Las páginas bajo el mismo padre necesitan direcciones distintas.',
+        'layout' => 'Una página con secciones se muestra a partir de ellas y no del texto. Elimine todas las secciones para volver a mostrar el texto.',
     ],
     'templates' => [
         'default' => 'Página',

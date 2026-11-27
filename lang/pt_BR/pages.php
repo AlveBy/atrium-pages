@@ -25,10 +25,12 @@ return [
         'parent' => 'Página pai',
         'template' => 'Modelo',
         'content' => 'Texto',
+        'layout' => 'Seções e blocos',
         'updated_at' => 'Alterada',
     ],
     'hints' => [
         'code' => 'A última parte do endereço da página. Páginas sob o mesmo pai precisam de endereços diferentes.',
+        'layout' => 'Uma página com seções é exibida a partir delas, e não do texto. Exclua todas as seções para exibir o texto novamente.',
     ],
     'templates' => [
         'default' => 'Página',

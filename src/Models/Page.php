@@ -20,6 +20,7 @@ use Atrium\Admin\Contracts\HasSeoFields;
 use Atrium\Admin\Contracts\Sitemapable;
 use Atrium\Admin\Fields\CheckboxField;
 use Atrium\Admin\Fields\ContentField;
+use Atrium\Admin\Fields\LayoutField;
 use Atrium\Admin\Fields\NumberField;
 use Atrium\Admin\Fields\SelectField;
 use Atrium\Admin\Fields\TextField;
@@ -54,6 +55,7 @@ use Illuminate\Validation\ValidationException;
  * @property string $code
  * @property string $name
  * @property string|null $content
+ * @property array<array-key,mixed>|null $layout
  * @property string $template
  * @property bool $active
  * @property int $sort
@@ -68,7 +70,7 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Owns
     /** @var array<int,string> */
     protected array $translatable = ['name', 'content'];
 
-    protected $fillable = ['site_id', 'parent_id', 'code', 'name', 'content', 'template', 'active', 'sort', 'source'];
+    protected $fillable = ['site_id', 'parent_id', 'code', 'name', 'content', 'layout', 'template', 'active', 'sort', 'source'];
 
     protected $attributes = [
         'template' => Templates::DEFAULT,
@@ -78,7 +80,7 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Owns
 
     protected function casts(): array
     {
-        return ['active' => 'boolean', 'sort' => 'integer', 'parent_id' => 'integer'];
+        return ['active' => 'boolean', 'sort' => 'integer', 'parent_id' => 'integer', 'layout' => 'array'];
     }
 
     protected static function booted(): void
@@ -169,6 +171,7 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Owns
                 ->options(Templates::options())->default(Templates::DEFAULT)->required(),
             NumberField::make('sort')->label(__('atrium::fields.standard.sort'))->default(500),
             ContentField::make('content')->label(__('atrium-pages::pages.fields.content'))->defaultMode('html')->ai(),
+            LayoutField::make('layout')->label(__('atrium-pages::pages.fields.layout'))->hint(__('atrium-pages::pages.hints.layout')),
         ];
     }
 

@@ -25,10 +25,12 @@ return [
         'parent' => 'Page parente',
         'template' => 'Modèle',
         'content' => 'Texte',
+        'layout' => 'Sections et blocs',
         'updated_at' => 'Modifiée',
     ],
     'hints' => [
         'code' => 'La dernière partie de l\'adresse de la page. Les pages d\'un même parent doivent en avoir des différentes.',
+        'layout' => 'Une page avec des sections est affichée à partir d\'elles et non du texte. Supprimez toutes les sections pour afficher de nouveau le texte.',
     ],
     'templates' => [
         'default' => 'Page',
