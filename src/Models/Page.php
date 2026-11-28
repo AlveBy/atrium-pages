@@ -17,6 +17,7 @@ use Atrium\Admin\Columns\TextColumn;
 use Atrium\Admin\Contracts\Administrable;
 use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Contracts\HasSeoFields;
+use Atrium\Admin\Contracts\Previewable;
 use Atrium\Admin\Contracts\Sitemapable;
 use Atrium\Admin\Fields\CheckboxField;
 use Atrium\Admin\Fields\ContentField;
@@ -36,7 +37,9 @@ use Atrium\Admin\Traits\Translatable;
 use Atrium\Pages\Actions\ChangeVisibility;
 use Atrium\Pages\Fields\PageCodeField;
 use Atrium\Pages\PageTree;
+use Atrium\Pages\PageView;
 use Atrium\Pages\Templates;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,7 +64,7 @@ use Illuminate\Validation\ValidationException;
  * @property int $sort
  * @property string|null $source
  */
-class Page extends Model implements Administrable, Cacheable, HasSeoFields, OwnsTemplateColumn, Sitemapable
+class Page extends Model implements Administrable, Cacheable, HasSeoFields, OwnsTemplateColumn, Previewable, Sitemapable
 {
     use BelongsToSite, CachesRecords, HasAdminSeo, HasAdminTabs, InteractsWithAdmin, Translatable;
 
@@ -242,6 +245,11 @@ class Page extends Model implements Administrable, Cacheable, HasSeoFields, Owns
         }
 
         return $data;
+    }
+
+    public function adminPreview(string $language): Renderable
+    {
+        return app(PageView::class)->make($this, $language);
     }
 
     /**

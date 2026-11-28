@@ -16,7 +16,7 @@ Add `--demo` to fill it with a shop's pages (about us with two subpages, deliver
 - The name and the text are written per content language; only the default language is required. The code is one for all languages: `/about` and `/de/about`.
 - Pages belong to a site: each site has its own tree.
 - Pages under one parent need different codes. A code may have capitals and underscores, so moved pages keep addresses like `/price_list`.
-- **Sections and blocks** under the text build the page from blocks instead: text, picture, gallery, button, map, a form, a menu, a reusable block. A page with at least one section is shown from them ([the site builder](../../docs/site-builder.md)).
+- **Sections and blocks** under the text build the page from blocks instead: text, picture, gallery, button, map, a form, a menu, a reusable block. A page with at least one section is shown from them. A saved page is built in the page editor: drag and drop or buttons, a preview, a draft, publishing and earlier versions ([the site builder](../../docs/site-builder.md)).
 - "Subpage", in a page's row and on its form, opens a new page with that page as its parent.
 - Deleting a page moves its subpages up to its parent.
 

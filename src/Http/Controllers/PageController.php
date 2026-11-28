@@ -9,17 +9,13 @@ declare(strict_types=1);
 
 namespace Atrium\Pages\Http\Controllers;
 
-use Atrium\Admin\Builder\Layout;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Pages\Models\Page;
 use Atrium\Pages\PageTree;
-use Atrium\Pages\Templates;
-use Atrium\Theme\Builder\LayoutRenderer;
-use Atrium\Theme\Pages as ThemePages;
+use Atrium\Pages\PageView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 /**
@@ -31,8 +27,7 @@ final class PageController extends Controller
     public function __construct(
         private readonly PageTree $tree,
         private readonly ContentLanguages $languages,
-        private readonly ThemePages $theme,
-        private readonly LayoutRenderer $layouts,
+        private readonly PageView $views,
     ) {}
 
     public function show(string $path): View|RedirectResponse
@@ -53,48 +48,7 @@ final class PageController extends Controller
 
         app()->setLocale($language);
 
-        $urls = $this->tree->urls($page);
-        $switch = [];
-
-        foreach ($this->languages->codes() as $code) {
-            $switch[$code] = $urls[$code] ?? $this->theme->homeUrl($code);
-        }
-
-        $breadcrumbs = $this->tree->ancestors($page)
-            ->map(fn (Page $ancestor): array => ['label' => $ancestor->name, 'url' => (string) $this->tree->url($ancestor, $language)])
-            ->all();
-
-        $children = $this->tree->children($page)
-            ->map(fn (Page $child): array => [
-                'title' => $child->name,
-                'url' => $this->tree->url($child, $language),
-                'text' => $child->getSeoDescription(),
-            ])
-            ->filter(fn (array $child): bool => $child['url'] !== null)
-            ->values()
-            ->all();
-
-        // A page with sections is drawn from them, any other from its text.
-        $sections = Layout::sections($page->layout);
-        $text = trim((string) $page->content);
-        $content = match (true) {
-            $sections !== [] => $this->layouts->render($sections),
-            $text !== '' => new HtmlString($text),
-            default => null,
-        };
-
-        return view(Templates::view($page->template), [
-            'page' => $page,
-            'defaultView' => Templates::defaultView(),
-            'title' => $page->name,
-            'content' => $content,
-            'built' => $sections !== [],
-            'children' => $children,
-            'canonical' => $url,
-            'breadcrumbs' => $breadcrumbs,
-            'alternates' => $urls,
-            'switch' => $switch,
-        ]);
+        return $this->views->make($page, $language);
     }
 
     /**

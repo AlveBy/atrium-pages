@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Atrium\Pages\Tests;
 
 use Atrium\Admin\History\Revisions;
+use Atrium\Admin\Models\AdminUser;
 use Atrium\Admin\Models\Language;
 use Atrium\Admin\Models\Revision;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Pages\Models\Page;
+use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia;
 
 /**
@@ -22,6 +24,8 @@ use Inertia\Testing\AssertableInertia;
  */
 final class BuilderTest extends TestCase
 {
+    private ?AdminUser $editor = null;
+
     /**
      * A tree with one section, one column and a text block.
      *
@@ -223,6 +227,72 @@ final class BuilderTest extends TestCase
             ->assertSessionHasErrors('layout');
 
         $this->assertSame(0, Page::query()->count());
+    }
+
+    /**
+     * What the page editor shows beside the page: the tree it holds, drawn on
+     * the server.
+     *
+     * @param  array<string,mixed>|null  $tree
+     */
+    private function previewOf(Page $page, ?array $tree, string $language = 'en'): TestResponse
+    {
+        return $this->actingAs($this->editor ??= $this->admin(), 'admin')
+            ->postJson("/admin/pages/{$page->id}/builder/layout/preview", ['tree' => $tree, 'language' => $language]);
+    }
+
+    public function test_the_editor_previews_blocks_not_saved_yet_as_the_site_draws_them(): void
+    {
+        Language::query()->create(['code' => 'de', 'name' => 'Deutsch', 'sort' => 200]);
+        $this->app->make(ContentLanguages::class)->forgetActive();
+        $parent = $this->aPage(['name' => ['en' => 'Company', 'de' => 'Firma'], 'code' => 'company']);
+        $page = $this->aPage([
+            'name' => ['en' => 'About us', 'de' => 'Über uns'],
+            'parent_id' => $parent->id,
+            'layout' => $this->tree(),
+        ]);
+        $typed = $this->tree(['en' => '<p>Typed.</p>', 'de' => '<p>Getippt.</p>']);
+
+        $this->previewOf($page, $typed, 'de')
+            ->assertOk()
+            ->assertSee('<html lang="de"', false)
+            ->assertSee('<h1>Über uns</h1>', false)
+            ->assertSee('<div class="b-block b-type-text" data-block-id="b1"><div class="content"><p>Getippt.</p></div>', false)
+            ->assertSee('href="http://localhost/de/company"', false)
+            ->assertSee('<link rel="canonical" href="http://localhost/de/company/about">', false)
+            ->assertDontSee('Built of blocks.', false)
+            ->assertDontSee('Typed.', false);
+
+        $this->assertTree($this->tree(), $page->fresh()->layout);
+        $this->get('/company/about')->assertSee('Built of blocks.', false)->assertDontSee('Typed.', false);
+    }
+
+    public function test_a_hidden_page_can_be_previewed_before_visitors_see_it(): void
+    {
+        $parent = $this->aPage(['name' => 'Company', 'code' => 'company', 'active' => false]);
+        $page = $this->aPage(['parent_id' => $parent->id, 'active' => false]);
+
+        $this->get('/company/about')->assertNotFound();
+
+        $this->previewOf($page, $this->tree())
+            ->assertOk()
+            ->assertSee('<h1>About us</h1>', false)
+            ->assertSee('<p>Built of blocks.</p>', false)
+            // It has no address yet: nothing on it leads to one.
+            ->assertDontSee('class="breadcrumbs"', false)
+            ->assertDontSee('rel="canonical"', false)
+            ->assertDontSee('hreflang', false);
+    }
+
+    public function test_the_preview_of_a_page_without_blocks_shows_its_text(): void
+    {
+        $page = $this->aPage(['layout' => $this->tree()]);
+
+        $this->previewOf($page, ['version' => 1, 'sections' => []])
+            ->assertOk()
+            ->assertSee('<p>The old text.</p>', false)
+            ->assertDontSee('atrium-layout', false);
+        $this->previewOf($page, null)->assertOk()->assertSee('<p>The old text.</p>', false);
     }
 
     public function test_an_older_version_brings_its_blocks_back(): void
